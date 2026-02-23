@@ -1,14 +1,60 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  devise_for :users, controllers: {
+    omniauth_callbacks: "users/omniauth_callbacks"
+  }
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Role-based roots
+  authenticated :user, ->(u) { u.admin? } do
+    root to: "admin/dashboards#show", as: :admin_root
+  end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  authenticated :user, ->(u) { u.instructor? } do
+    root to: "instructor/dashboards#show", as: :instructor_root
+  end
+
+  authenticated :user do
+    root to: "dashboards#show", as: :student_root
+  end
+
+  unauthenticated :user do
+    root to: redirect("/users/sign_in")
+  end
+
+
+
+
+  # Admin Namespace
+  namespace :admin do
+    resource :dashboard, only: [ :show ]
+    resources :cohorts
+    resources :users
+    resources :enrollments, only: [ :new, :create, :destroy ]
+  end
+
+  # Instructor Namespace
+  namespace :instructor do
+    resource :dashboard, only: [ :show ]
+    resources :lectures
+    resources :class_sessions
+    resources :challenges
+    resources :submissions, only: [ :index, :show, :update ]
+    resources :attendances, only: [ :index, :update ]
+  end
+
+  # Student Routes (Root Namespace)
+  resource :dashboard, only: [ :show ]
+  resources :lectures, only: [ :index, :show ]
+  resources :class_sessions, only: [ :index ] do
+    resources :attendances, only: [ :create ]
+  end
+  resources :challenges, only: [ :index, :show ]
+  resources :submissions, only: [ :index, :show, :create, :update ]
+  resources :flashcards, only: [ :index, :show ] do
+    collection do
+      get :bookmarks
+      get :needs_attention
+      get :rehearse
+    end
+  end
 end

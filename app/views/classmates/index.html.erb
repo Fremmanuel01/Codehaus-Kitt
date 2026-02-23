@@ -1,0 +1,79 @@
+<div class="row justify-content-center">
+  <div class="col-xl-10">
+    
+    <!-- Top Action Bar -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+      <ul class="nav nav-tabs border-bottom-0 gap-2 mb-0" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link border-0 fw-bold active bg-dark text-white rounded-pill px-4" href="#">Classmates</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link border-0 fw-bold text-muted bg-white rounded-pill px-4 shadow-sm" href="#">Guess who?</a>
+        </li>
+      </ul>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-dark fw-bold bg-white shadow-sm"><i class="bi bi-person-bounding-box me-2"></i>Mug shots</button>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal / Form (Accordion for MVP) -->
+    <div class="accordion mb-5 shadow-sm" id="editProfileAccordion" style="border-radius: 12px; overflow: hidden;">
+      <div class="accordion-item border-0">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#editProfileCollapse">
+            <i class="bi bi-pencil-square me-2 text-primary"></i> Edit your profile
+          </button>
+        </h2>
+        <div id="editProfileCollapse" class="accordion-collapse collapse bg-light" data-bs-parent="#editProfileAccordion">
+          <div class="accordion-body p-4">
+            <%= form_with model: current_user, url: update_profile_classmates_path, method: :patch, class: "row g-3" do |f| %>
+              <div class="col-md-8">
+                <%= f.label :bio, "Your Bio", class: "form-label fw-bold text-muted small text-uppercase" %>
+                <%= f.text_area :bio, class: "form-control", rows: 3 %>
+              </div>
+              <div class="col-md-4">
+                <%= f.label :avatar_url, "Avatar URL", class: "form-label fw-bold text-muted small text-uppercase" %>
+                <%= f.text_field :avatar_url, class: "form-control" %>
+              </div>
+              <div class="col-12 mt-3">
+                <%= f.submit "Save changes", class: "btn btn-primary fw-bold px-4" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classmates List -->
+    <div class="card shadow-sm border-0 mb-5" style="border-radius: 12px;">
+      <div class="list-group list-group-flush">
+        <% @classmates.each do |mate| %>
+          <div class="list-group-item py-4 px-4 border-0 border-bottom last:border-0 <%= 'bg-primary bg-opacity-10' if mate == current_user %>">
+            <div class="d-flex gap-4">
+              <%= image_tag mate.avatar_url, class: "rounded-circle border border-2 border-white shadow-sm flex-shrink-0", style: "width: 80px; height: 80px; object-fit: cover;" %>
+              
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <h5 class="fw-bold mb-0 text-dark">
+                    <%= mate.first_name %> <%= mate.last_name %>
+                    <% if mate == current_user %>
+                      <span class="badge bg-primary ms-2 align-text-bottom">You</span>
+                    <% end %>
+                  </h5>
+                  <div class="text-muted small fw-bold text-uppercase"><%= mate.role %></div>
+                </div>
+                <p class="text-muted mb-0" style="line-height: 1.6;"><%= mate.bio || "No bio yet." %></p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.last\:border-0:last-child { border-bottom: 0 !important; }
+</style>

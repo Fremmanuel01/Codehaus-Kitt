@@ -1,0 +1,85 @@
+<div class="row justify-content-center">
+  <div class="col-xl-9 col-xxl-8">
+    
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+      <h3 class="fw-bold mb-0">Flashcards</h3>
+      <div class="text-muted fw-bold">Daily Goal: 0 / 20</div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs border-bottom-0 mb-4 gap-2" role="tablist">
+      <li class="nav-item">
+        <%= link_to "Playboard", flashcards_path, class: "nav-link border-0 fw-bold #{'active bg-primary text-white rounded-pill px-4' if current_page?(flashcards_path)}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Bookmarks", bookmarks_flashcards_path, class: "nav-link border-0 fw-bold #{current_page?(bookmarks_flashcards_path) ? 'active bg-primary text-white rounded-pill px-4' : 'text-muted bg-white rounded-pill px-4 shadow-sm'}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Needs attention", needs_attention_flashcards_path, class: "nav-link border-0 fw-bold #{current_page?(needs_attention_flashcards_path) ? 'active bg-primary text-white rounded-pill px-4' : 'text-muted bg-white rounded-pill px-4 shadow-sm'}" %>
+      </li>
+      <li class="nav-item">
+        <%= link_to "Rehearse", rehearse_flashcards_path, class: "nav-link border-0 fw-bold #{current_page?(rehearse_flashcards_path) ? 'active bg-primary text-white rounded-pill px-4' : 'text-muted bg-white rounded-pill px-4 shadow-sm'}" %>
+      </li>
+    </ul>
+
+    <!-- Decks Grid -->
+    <% sections = @decks.group_by(&:section) %>
+    <% sections.each do |section, decks| %>
+      <div class="mb-5">
+        <h5 class="fw-bold text-dark mb-3 ps-1"><%= section %></h5>
+        
+        <div class="row g-4">
+          <% decks.each do |deck| %>
+            <% progress = deck.user_flashcard_progresses.find_by(user: current_user) %>
+            <% status = progress&.status || "locked" %>
+            <% pct = progress&.progress_percent || 0 %>
+            <% locked = status == "locked" %>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm border-0 position-relative overflow-hidden <%= 'opacity-50 bg-light' if locked %>" style="border-radius: 12px; transition: transform 0.2s;">
+                
+                <!-- Ribbons -->
+                <% if status == "needs_attention" %>
+                  <div class="position-absolute bg-primary text-white small fw-bold text-center py-1" style="top: 15px; right: -35px; width: 120px; transform: rotate(45deg); z-index: 5;">Review</div>
+                <% elsif status == "completed" %>
+                  <div class="position-absolute bg-success text-white small fw-bold text-center py-1" style="top: 15px; right: -35px; width: 120px; transform: rotate(45deg); z-index: 5;">Done</div>
+                <% end %>
+
+                <div class="card-body p-4 d-flex flex-column h-100">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h6 class="fw-bold mb-0 text-dark pe-4"><%= deck.title %></h6>
+                    <% if locked %>
+                      <i class="bi bi-lock-fill text-muted fs-5"></i>
+                    <% else %>
+                      <span class="badge rounded-pill <%= pct > 80 ? 'bg-success' : (pct > 40 ? 'bg-warning text-dark' : 'bg-danger') %>"><%= pct %>%</span>
+                    <% end %>
+                  </div>
+                  
+                  <div class="text-muted small mt-auto fw-medium">
+                    <i class="bi bi-collection me-1"></i><%= deck.cards_count %> cards
+                  </div>
+                </div>
+
+                <% unless locked %>
+                  <%= link_to "", flashcard_path(deck), class: "stretched-link" %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @decks.empty? %>
+      <div class="text-center text-muted py-5 mt-4">
+        <i class="bi bi-card-heading fs-1 mb-3 d-block opacity-50"></i>
+        <h5 class="fw-bold">No flashcard decks found.</h5>
+      </div>
+    <% end %>
+
+  </div>
+</div>
+
+<style>
+.card:hover { transform: translateY(-3px); }
+</style>

@@ -1,0 +1,77 @@
+<div class="login-page-container">
+  <!-- Left Side: Background Image -->
+  <div class="login-image-side">
+    <div class="position-absolute bottom-0 start-0 p-5 text-white z-2">
+      <h1 class="display-4 fw-bold mb-3">Begin your <span>journey</span>.</h1>
+      <p class="lead opacity-75">Create your account and unlock the world of modern software development.</p>
+    </div>
+  </div>
+
+  <!-- Right Side: Sign Up Form -->
+  <div class="login-form-side">
+    <div class="login-card">
+      <div class="login-logo mb-4">
+        <i class="bi bi-person-plus text-primary"></i>
+        CODEHAUS<span>KITT</span>
+      </div>
+
+      <h2 class="fw-bold mb-1">Create Account</h2>
+      <p class="text-muted mb-4">Join our community of world-class developers.</p>
+
+      <%- if devise_mapping.omniauthable? %>
+        <%- resource_class.omniauth_providers.each do |provider| %>
+          <%= button_to omniauth_authorize_path(resource_name, provider), data: { turbo: false }, class: "google-btn rounded-3 mb-3" do %>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo">
+            Sign up with Google
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <div class="divider">or</div>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "mt-2" }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div class="row g-2">
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <%= f.text_field :first_name, autofocus: true, class: "form-control shadow-none border-top-0 border-start-0 border-end-0 rounded-0 bg-transparent", id: "floatingFirstName", placeholder: "First Name" %>
+              <%= f.label :first_name, for: "floatingFirstName" %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating mb-3">
+              <%= f.text_field :last_name, class: "form-control shadow-none border-top-0 border-start-0 border-end-0 rounded-0 bg-transparent", id: "floatingLastName", placeholder: "Last Name" %>
+              <%= f.label :last_name, for: "floatingLastName" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-floating mb-3">
+          <%= f.email_field :email, autocomplete: "email", class: "form-control shadow-none border-top-0 border-start-0 border-end-0 rounded-0 bg-transparent", id: "floatingEmail", placeholder: "name@example.com" %>
+          <%= f.label :email, for: "floatingEmail" %>
+        </div>
+
+        <div class="form-floating mb-3">
+          <%= f.password_field :password, autocomplete: "new-password", class: "form-control shadow-none border-top-0 border-start-0 border-end-0 rounded-0 bg-transparent", id: "floatingPassword", placeholder: "Password" %>
+          <%= f.label :password, for: "floatingPassword" %>
+        </div>
+
+        <div class="form-floating mb-4">
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control shadow-none border-top-0 border-start-0 border-end-0 rounded-0 bg-transparent", id: "floatingPasswordConfirm", placeholder: "Confirm Password" %>
+          <%= f.label :password_confirmation, for: "floatingPasswordConfirm" %>
+        </div>
+
+        <div class="d-grid">
+          <%= f.submit "Create Account", class: "btn btn-login py-3 rounded-3" %>
+        </div>
+      <% end %>
+
+      <div class="mt-5 text-center">
+        <p class="text-muted small">Already have an account? 
+          <%= link_to "Sign In", new_session_path(resource_name), class: "text-decoration-none text-primary fw-bold" %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

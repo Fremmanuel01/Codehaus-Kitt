@@ -1,0 +1,98 @@
+<div class="d-flex h-100 mx-n3 mt-n4 mb-n5" style="min-height: calc(100vh - 72px);">
+  
+  <!-- Col 1: Icon Rail -->
+  <div class="bg-dark text-white d-flex flex-column align-items-center py-4" style="width: 60px; flex-shrink: 0;">
+    <a href="#" class="text-white opacity-50 mb-4 hover-opacity-100" title="Home"><i class="bi bi-house-door fs-5"></i></a>
+    <a href="#" class="text-white mb-4 position-relative border-start border-3 border-primary ps-1 pe-2 ms-n1" title="Challenges"><i class="bi bi-code-square fs-5 text-primary"></i></a>
+    <a href="#" class="text-white opacity-50 mb-4 hover-opacity-100" title="Quizzes"><i class="bi bi-patch-question fs-5"></i></a>
+    <a href="#" class="text-white opacity-50 mt-auto hover-opacity-100" title="Help"><i class="bi bi-question-circle fs-5"></i></a>
+  </div>
+
+  <!-- Col 2: Sidebar (Tracks & Steps) -->
+  <div class="bg-white border-end d-flex flex-column" style="width: 300px; flex-shrink: 0; overflow-y: auto;">
+    <div class="p-3 border-bottom bg-light bg-opacity-50">
+      <h6 class="fw-bold mb-0 text-uppercase text-muted" style="font-size: 0.75rem;">Modules</h6>
+    </div>
+    
+    <div class="flex-grow-1 overflow-y-auto">
+      <div class="accordion accordion-flush" id="tracksAccordion">
+        <% @tracks.each_with_index do |track, i| %>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button <%= 'collapsed' unless @challenge&.track_id == track.id %> fw-bold text-dark" style="font-size: 0.9rem;" type="button" data-bs-toggle="collapse" data-bs-target="#trackCollapse<%= track.id %>" aria-expanded="<%= @challenge&.track_id == track.id ? 'true' : 'false' %>">
+                <%= track.position %>. <%= track.name %>
+              </button>
+            </h2>
+            <div id="trackCollapse<%= track.id %>" class="accordion-collapse collapse <%= 'show' if @challenge&.track_id == track.id || (@challenge.nil? && i == 0) %>" data-bs-parent="#tracksAccordion">
+              <div class="accordion-body p-0">
+                <div class="list-group list-group-flush">
+                  <% track.challenges.each do |challenge| %>
+                    <%= link_to challenge.title, challenge_path(challenge), class: "list-group-item list-group-item-action border-0 py-2 px-4 #{'active bg-primary bg-opacity-10 text-primary border-start border-3 border-primary' if @challenge == challenge}" %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Col 3: Content area -->
+  <div class="flex-grow-1 bg-body d-flex flex-column h-100 position-relative overflow-y-auto">
+    <div class="p-4 flex-grow-1">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <ul class="nav nav-tabs border-0" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active bg-white border-0 text-dark fw-bold rounded-top rounded-start" data-bs-toggle="tab" data-bs-target="#instructions-tab" type="button" role="tab">Instructions</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link border-0 text-muted fw-bold rounded-top rounded-end" data-bs-toggle="tab" data-bs-target="#assistant-tab" type="button" role="tab"><i class="bi bi-robot me-2"></i>Assistant</button>
+          </li>
+        </ul>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary fw-bold bg-white text-muted">Report an issue</button>
+          <button class="btn btn-sm btn-outline-dark fw-bold bg-white"><i class="bi bi-github me-2"></i>View on GitHub</button>
+        </div>
+      </div>
+
+      <div class="tab-content border-top pt-4">
+        <div class="tab-pane fade show active" id="instructions-tab" role="tabpanel" tabindex="0">
+          <div class="bg-white p-5 rounded-3 shadow-sm markdown-body" style="max-width: 900px; margin: 0 auto;">
+            <% if @challenge %>
+              <%= render_markdown(@challenge.instructions) %>
+            <% else %>
+              <div class="text-center text-muted py-5">
+                <i class="bi bi-arrow-left-circle fs-1 mb-3 d-block"></i>
+                <h4 class="fw-bold">Welcome to Challenges!</h4>
+                <p>Select a challenge from the sidebar to begin.</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="assistant-tab" role="tabpanel" tabindex="0">
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-robot fs-1 mb-3 d-block text-primary opacity-50"></i>
+            <h4 class="fw-bold">AI Assistant Setup Required</h4>
+            <p>Assistant functionality is not yet configured for this MVP.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Helper Bar -->
+    <div class="bg-white border-top p-3 d-flex justify-content-between align-items-center mt-auto" style="position: sticky; bottom: 0; z-index: 10;">
+      <span class="text-muted fw-medium small">Not sure how to begin?</span>
+      <button class="btn btn-sm btn-light border text-primary fw-bold"><i class="bi bi-robot me-2"></i>Ask Wott for help (beta)</button>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: bold; margin-bottom: 1rem; }
+.markdown-body pre { background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #dee2e6; margin-bottom: 1rem; }
+.markdown-body code { background: #f8f9fa; padding: 0.2rem 0.4rem; border-radius: 4px; color: #fb8500; }
+.hover-opacity-100:hover { opacity: 1 !important; }
+.accordion-button:not(.collapsed)::after { background-image: var(--bs-accordion-btn-icon); transform: rotate(-180deg); filter: brightness(0); }
+</style>

@@ -1,0 +1,166 @@
+<div class="dashboard-container">
+  <div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="welcome-section d-flex justify-content-between align-items-end">
+      <div>
+        <div class="module-badge mb-3">
+          <i class="bi bi-rocket-takeoff"></i> <%= @current_module %>
+        </div>
+        <h1>Welcome back, <span><%= current_user.first_name %></span>.</h1>
+        <p class="text-muted">You're making great progress in the Rails MVP cohort.</p>
+      </div>
+      <div class="d-none d-md-block text-end">
+        <p class="mb-1 fw-bold"><%= Date.today.strftime("%A, %B %d") %></p>
+        <p class="small text-muted mb-0">Cohort: <%= current_user.cohort&.name || "General" %></p>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <!-- Active Lecture -->
+      <div class="col-lg-8">
+        <div class="glass-card">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 fw-bold mb-0">Active Lecture</h2>
+            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">Today</span>
+          </div>
+          
+          <% if @today_lecture %>
+            <div class="p-4 rounded-4 mb-4" style="background: rgba(2, 48, 71, 0.03);">
+              <h3 class="h2 fw-bold mb-2"><%= @today_lecture.title %></h3>
+              <p class="text-muted mb-4"><%= @today_lecture.week %></p>
+              
+              <div class="d-flex gap-4">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-file-earmark-slides text-primary"></i>
+                  <span><%= @today_lecture.slide_count %> Slides</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-calendar-check text-primary"></i>
+                  <span><%= @today_lecture.date.strftime("%b %d") %></span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-3">
+              <%= link_to lecture_path(@today_lecture), class: "btn btn-primary px-4 py-2 rounded-3" do %>
+                <i class="bi bi-play-fill"></i> Continue Learning
+              <% end %>
+              <%= link_to lectures_path, class: "btn btn-outline-secondary px-4 py-2 rounded-3" do %>
+                Browse History
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-5">
+              <i class="bi bi-calendar-x display-4 text-muted mb-3 d-block"></i>
+              <p class="text-muted">No lectures scheduled for today.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="col-lg-4">
+        <div class="d-flex flex-column gap-3 h-100">
+          <h2 class="h5 fw-bold mb-2 ps-2">Quick Actions</h2>
+          
+          <%= link_to class_sessions_path, class: "glass-card action-card" do %>
+            <div class="action-icon accent-orange">
+              <i class="bi bi-qr-code-scan"></i>
+            </div>
+            <div class="action-content">
+              <h3>Mark Attendance</h3>
+              <p>
+                <% if @attendance %>
+                  <span class="text-success"><i class="bi bi-check-circle-fill"></i> Status: <%= @attendance.status.titleize %></span>
+                <% elsif @today_session&.status == 'open' %>
+                  <span class="text-warning fw-bold">Session Open - Mark Now</span>
+                <% else %>
+                  Scan for today's session
+                <% end %>
+              </p>
+            </div>
+          <% end %>
+
+          <%= link_to challenges_path, class: "glass-card action-card" do %>
+            <div class="action-icon accent-blue">
+              <i class="bi bi-code-slash"></i>
+            </div>
+            <div class="action-content">
+              <h3>View Challenges</h3>
+              <p><%= @challenges.count %> Pending tasks</p>
+            </div>
+          <% end %>
+
+          <%= link_to rehearse_flashcards_path, class: "glass-card action-card" do %>
+            <div class="action-icon accent-orange" style="background: rgba(251, 133, 0, 0.1); color: #fb8500;">
+              <i class="bi bi-lightning-charge"></i>
+            </div>
+            <div class="action-content">
+              <h3>Flashcards</h3>
+              <p>Daily review session</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row g-4">
+      <!-- Recent Challenges -->
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card">
+          <h2 class="h5 fw-bold mb-4">Active Challenges</h2>
+          <% if @challenges.any? %>
+            <% @challenges.each do |challenge| %>
+              <div class="feed-item">
+                <div class="feed-date">New Assignment</div>
+                <div class="feed-title"><%= challenge.title %></div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                  <span class="small text-muted"><%= challenge.track&.name %></span>
+                  <%= link_to "Details", challenge_path(challenge), class: "btn btn-sm btn-link p-0 text-primary fw-bold text-decoration-none" %>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="text-muted small">All caught up!</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- My Statistics -->
+      <div class="col-md-6 col-lg-8">
+        <div class="glass-card">
+          <h2 class="h5 fw-bold mb-4">Learning Insights</h2>
+          <div class="row g-4">
+            <div class="col-sm-6 col-md-4">
+              <div class="stat-card">
+                <div class="stat-icon accent-blue">
+                  <i class="bi bi-check2-circle"></i>
+                </div>
+                <div class="stat-value">85%</div>
+                <div class="stat-label">Attendance</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+              <div class="stat-card">
+                <div class="stat-icon accent-orange">
+                  <i class="bi bi-journal-text"></i>
+                </div>
+                <div class="stat-value"><%= current_user.submissions.count %></div>
+                <div class="stat-label">Submissions</div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-4">
+              <div class="stat-card">
+                <div class="stat-icon accent-blue">
+                  <i class="bi bi-trophy"></i>
+                </div>
+                <div class="stat-value">Level 4</div>
+                <div class="stat-label">Power Rank</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

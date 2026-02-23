@@ -1,0 +1,85 @@
+<div class="row justify-content-center">
+  <div class="col-xl-10">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+      <div>
+        <h3 class="fw-bold mb-1">Events for <%= current_user.cohort&.name %></h3>
+        <p class="text-muted mb-0"><i class="bi bi-clock me-1"></i>All times are shown in your local timezone.</p>
+      </div>
+      <div>
+        <button class="btn btn-outline-dark fw-bold bg-white text-dark shadow-sm px-4">
+          <i class="bi bi-calendar-plus me-2"></i>Import to Google Calendar
+        </button>
+      </div>
+    </div>
+
+    <!-- Calendar Controls -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0 text-dark"><%= Date.today.strftime("%B %Y") %></h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-light border fw-bold text-muted"><i class="bi bi-chevron-left"></i></button>
+        <button class="btn btn-sm btn-light border fw-bold text-dark px-3">Today</button>
+        <button class="btn btn-sm btn-light border fw-bold text-muted"><i class="bi bi-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Month Grid Calendar -->
+    <div class="card shadow-sm border-0 mb-5" style="border-radius: 12px; overflow: hidden;">
+      <!-- Days of Week Header -->
+      <div class="row g-0 border-bottom bg-light">
+        <% ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].each do |day| %>
+          <div class="col text-center py-2 fw-bold text-muted small text-uppercase" style="border-right: 1px solid #dee2e6;">
+            <%= day %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Calendar Grid Body (Simplified 5 weeks MVP) -->
+      <% 
+        # Calculate dates for the grid
+        start_date = Date.today.beginning_of_month.beginning_of_week(:monday)
+        end_date = start_date + 34.days 
+        current_date = start_date
+      %>
+      
+      <% while current_date <= end_date do %>
+        <div class="row g-0 border-bottom last:border-0" style="min-height: 120px;">
+          <% 7.times do %>
+            <% is_today = current_date == Date.today %>
+            <% is_current_month = current_date.month == Date.today.month %>
+            <% day_events = @events.select { |e| e.start_time.to_date == current_date } %>
+            
+            <div class="col position-relative p-2" style="border-right: 1px solid #dee2e6; <%= 'background-color: rgba(251, 133, 0, 0.05);' if is_today %> <%= 'opacity: 0.5; background-color: #f8f9fa;' unless is_current_month %>">
+              
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="fw-bold <%= is_today ? 'text-primary' : 'text-dark' %>" style="font-size: 0.9rem;">
+                  <%= current_date.day %>
+                </span>
+              </div>
+
+              <!-- Events for the day -->
+              <div class="d-flex flex-column gap-1">
+                <% day_events.each do |event| %>
+                  <div class="bg-primary bg-opacity-10 opacity-100 text-primary rounded px-2 py-1" style="font-size: 0.75rem;">
+                    <div class="fw-bold"><%= event.start_time.strftime("%H:%M") %></div>
+                    <div class="text-truncate" title="<%= event.title %>"><%= event.title %></div>
+                  </div>
+                <% end %>
+              </div>
+
+            </div>
+            <% current_date += 1.day %>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
+
+  </div>
+</div>
+
+<style>
+.last\:border-0:last-child { border-bottom: 0 !important; }
+.col:last-child { border-right: 0 !important; }
+</style>

@@ -38,5 +38,7 @@ module CodehausKitt
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    # Disable raise on missing callback actions for Pundit index fallback
+    config.action_controller.raise_on_missing_callback_actions = false
   end
 end

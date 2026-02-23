@@ -1,0 +1,57 @@
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-8">
+    
+    <!-- Header & Search -->
+    <div class="d-flex justify-content-between align-items-center mb-5 mt-4">
+      <h3 class="fw-bold mb-0 flex-grow-1">Lectures</h3>
+      <div class="input-group" style="max-width: 300px;">
+        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control border-start-0 ps-0 pe-2" placeholder="Search a lecture or topic..." style="box-shadow: none;">
+      </div>
+    </div>
+
+    <!-- Lectures Grouped by Week -->
+    <% @lectures.group_by(&:week).each do |week, lectures| %>
+      <div class="mb-5">
+        <h5 class="fw-bold text-dark mb-3 ps-1">Week <%= week %></h5>
+        
+        <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+          <div class="list-group list-group-flush">
+            <% lectures.each do |lecture| %>
+              <%= link_to lecture_path(lecture), class: "list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4 border-0 border-bottom last:border-0" do %>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-play-fill fs-4 ms-1"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-1"><%= lecture.title %></h6>
+                    <div class="text-muted small"><%= lecture.slide_count %> slides</div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 text-end">
+                  <div class="text-muted small fw-medium text-nowrap">
+                    <%= lecture.date.strftime("%a, %b %d") %>
+                  </div>
+                  <%= image_tag lecture.teacher.avatar_url, class: "rounded-circle border border-2 border-white shadow-sm", style: "width: 32px; height: 32px;", title: lecture.teacher.first_name %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @lectures.empty? %>
+      <div class="text-center text-muted py-5 bg-white rounded-3 shadow-sm border mt-4">
+        <i class="bi bi-camera-video fs-1 mb-3 d-block opacity-50"></i>
+        <h5 class="fw-bold">No lectures found.</h5>
+        <p>Check back later when your cohort starts.</p>
+      </div>
+    <% end %>
+
+  </div>
+</div>
+
+<style>
+.last\:border-0:last-child { border-bottom: 0 !important; }
+</style>
